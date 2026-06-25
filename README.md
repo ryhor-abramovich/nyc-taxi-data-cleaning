@@ -35,6 +35,8 @@ $$\text{Tip Ratio} = \frac{\text{Tip Amount}}{\text{Fare Amount}} \times 100$$
 2. **The Weekend Late-Night Myth:** While weekend nights (Friday & Saturday, 00:00–04:00) do show steady tipping behavior, they do not surpass the structured volume of the weekday business rush hour.
 ---
 
+![NYC Taxi Tipping Heatmap](heatmap.png)
+
 ## 🔍 Critical Analytical Note on Data Collection
 <details>
 <summary><b>Click to expand: Why the Mean would lie to you in this dataset</b></summary>
