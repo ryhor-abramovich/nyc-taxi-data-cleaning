@@ -26,13 +26,13 @@ To ensure data integrity, I designed and implemented a strict filtering pipeline
 Using custom feature engineering (`hour`, `day`) and pivot tables aggregated by the **median tip ratio**, I uncovered distinct passenger behavior patterns.
 
 
+
+### Key Insights:
+
 $$\text{Tip Ratio} = \frac{\text{Tip Amount}}{\text{Fare Amount}} \times 100$$
 
-
-### Key Findings:
-1. **The Weekend Surge (Friday & Saturday Night):** A clear spike in generosity occurs between **00:00 and 04:00** on weekends, where the median tip ratio peaks at **26.5%**. Passengers returning from bars and restaurants are significantly more relaxed and prone to tipping higher.
-2. **The Business Standard (Weekdays):** Monday through Thursday daytime trips show a highly consistent median tip ratio of **24% to 25%**, reflecting standard tipping etiquette without emotional outliers.
-
+1. **The Rush Hour Dominance (Mon–Fri, 16:00–19:00):** Contrary to the initial hypothesis about weekend party-goers, data reveals that the highest and most consistent tip ratios occur during weekday evening rush hours. This is likely driven by corporate commuters and traffic gridlocks, where passengers are more inclined to tip higher.
+2. **The Weekend Late-Night Myth:** While weekend nights (Friday & Saturday, 00:00–04:00) do show steady tipping behavior, they do not surpass the structured volume of the weekday business rush hour.
 ---
 
 ## 🔍 Critical Analytical Note on Data Collection
