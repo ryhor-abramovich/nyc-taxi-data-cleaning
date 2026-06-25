@@ -28,7 +28,6 @@ Using custom feature engineering (`hour`, `day`) and pivot tables aggregated by 
 
 $$\text{Tip Ratio} = \frac{\text{Tip Amount}}{\text{Fare Amount}} \times 100$$
 
-1. **The Weekend Surge (Friday & Saturday Night):**
 
 ### Key Findings:
 1. **The Weekend Surge (Friday & Saturday Night):** A clear spike in generosity occurs between **00:00 and 04:00** on weekends, where the median tip ratio peaks at **26.5%**. Passengers returning from bars and restaurants are significantly more relaxed and prone to tipping higher.
