@@ -46,3 +46,16 @@ During the exploratory phase, I discovered that the system only captures tipping
 * **The Bias:** If we used the standard average (`mean`), these artificial cash zeroes would heavily drag down the metrics, showing fake low tips.
 * **The Solution:** Relying on the **median** was a deliberate analytical choice. Since card trips represent the majority of the dataset, the median successfully neutralized this collection bias, preventing cash zeroes from skewing the true operational metrics.
 </details>
+
+## ⚡ Performance Optimization & Advanced Metrics
+* **Big Data Performance:** The pipeline directly processes memory-heavy `.parquet` columnar files using vectorized Pandas operations, optimizing RAM utilization on large scales.
+* **Operational Efficiency Metrics:** Engineered custom performance indicators to evaluate taxi fleet economics:
+  * `speed_mph`: Vectorized vehicle velocity tracking to pinpoint urban congestion impact.
+  * `revenue_per_minute`: Financial yield assessment per operational minute across different tariff codes (`RatecodeID`).
+
+## 🛠️ Technical Stack
+* **Language:** Python 3
+* **Data Processing:** Pandas (Vectorized filtering, Pivot tables, Conditional formatting), NumPy
+* **Storage Engine:** PyArrow / FastParquet
+* **Visualization:** Matplotlib, Seaborn
+
