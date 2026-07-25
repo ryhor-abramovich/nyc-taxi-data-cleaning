@@ -18,7 +18,7 @@ To ensure data integrity, I designed and implemented a strict filtering pipeline
 | **Zero-Distance Exceptions** | Allow `0` miles *only* if fare is `$2.5` - `$70` | Preserves valid trips trapped in gridlock/traffic |
 | **Temporal Paradoxes** | Duration must be between `1 min` and `2 hours` | Eliminates instant cancellations and unclosed meters |
 
-> 📉 **Result:** This multi-stage filtering pipeline successfully removed approximately **30% of information noise**, reducing the dataset from 3.5M to a clean and robust **2.8 million records**.
+> 📉 **Result:** This multi-stage filtering pipeline successfully removed approximately **19% of information noise**, reducing the dataset from 3.5M to a clean and robust **2.8 million records**.
 
 ---
 
