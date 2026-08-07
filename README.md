@@ -39,7 +39,7 @@ $$
 
 The following heatmap shows the median tip ratio by hour and day of the week:
 
-![Tip ratio by hour and day](tip_ratio_heatmap.png)
+![Tip ratio by hour and day](heatmap.PNG)
 
 ### Key observations
 
