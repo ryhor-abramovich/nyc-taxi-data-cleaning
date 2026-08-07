@@ -113,5 +113,5 @@ These metrics were used to investigate relationships between time, congestion, r
 ```text
 .
 ├── README.md
-├── tip_ratio_heatmap.png
+├── heatmap.png
 └── nyc-taxi-data-cleaning.ipynb
