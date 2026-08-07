@@ -1,60 +1,148 @@
 # 🚖 Data Cleaning and Exploratory Analysis of NYC Taxi Dataset (3.5M Records)
 
 ## 📌 Project Overview
-In this project, I performed a comprehensive data cleaning and exploratory data analysis (EDA) on raw historical New York City taxi trip records. The main goal was to identify and eliminate system glitches, technical anomalies, and noise to prepare a pristine dataset suitable for reliable business intelligence and analysis.
+
+This project focuses on data cleaning and exploratory data analysis (EDA) of raw historical New York City taxi trip records.
+
+The main goal was to identify technical anomalies, inconsistent records, and data-quality issues, then build a clean dataset suitable for reliable statistical and business analysis.
+
+The original dataset contained approximately **3.5 million taxi trips**. After applying the cleaning pipeline, approximately **2.8 million records** remained.
 
 ---
 
-## 🛠️ Data Cleaning & Anomaly Detection Log
-To ensure data integrity, I designed and implemented a strict filtering pipeline based on logical constraints and domain reality. 
+## 🛠️ Data Cleaning & Anomaly Detection
 
-### Filtering Pipeline Summary
+A multi-stage filtering pipeline was designed using logical constraints and domain-specific checks.
 
-| Feature | Cleaning Rule / Logic | Context |
+### Filtering Pipeline
+
+| Feature | Cleaning Rule | Rationale |
 | :--- | :--- | :--- |
-| **Passenger Count** | 1 ≤ passenger_count ≤ 6 | Removes empty trips or data entry errors |
-| **Trip Distance** | Remove trips with distance > 60 miles | Eliminates extreme GPS outliers |
-| **Financials (`fare_amount`)** | 2.5 ≤ fare_amount ≤ 200 | Removes negative values and terminal glitches |
-| **Zero-Distance Exceptions** | Allow `0` miles *only* if fare is `$2.5` - `$70` | Preserves valid trips trapped in gridlock/traffic |
-| **Temporal Paradoxes** | Duration must be between `1 min` and `2 hours` | Eliminates instant cancellations and unclosed meters |
+| **Passenger Count** | `1 ≤ passenger_count ≤ 6` | Removes invalid passenger counts and obvious data-entry errors |
+| **Trip Distance** | Remove trips with `trip_distance > 60` miles | Filters extreme distance values and potential GPS anomalies |
+| **Fare Amount** | Keep `$2.5 ≤ fare_amount ≤ $200` | Removes negative, zero, and implausibly high fares |
+| **Zero-Distance Trips** | Retain `0` miles when fare is between `$2.5` and `$70` | Allows potentially valid stopped/traffic-related trips to remain |
+| **Trip Duration** | Keep trips between `1 minute` and `2 hours` | Removes implausibly short and excessively long trips |
 
-> 📉 **Result:** Approximately 19% of records were removed by the filtering pipeline, reducing the dataset from 3.5M to 2.8M trips.
+### Zero-Distance Trips
+
+Zero distance was **not automatically treated as an anomaly**.
+
+Trips with `trip_distance = 0` were retained when the recorded fare was within a plausible range (`$2.5–$70`). This accounts for potentially valid situations where a taxi was stopped or barely moving while the meter was active.
+
+### Result
+
+The filtering pipeline removed approximately **19% of the original records**, reducing the dataset from approximately **3.5M to 2.8M trips**.
+
 ---
 
-## 📊 Key Business Insight: High-Yield Hours for Drivers
-Using custom feature engineering (`hour`, `day`) and pivot tables aggregated by the **median tip ratio**, I uncovered distinct passenger behavior patterns.
+## 📊 Feature Engineering
 
+Several features were created to support temporal and operational analysis:
 
+- `hour` — hour of pickup
+- `day` — day of the week
+- `tip_ratio` — tip amount relative to fare amount
+- `speed_mph` — estimated trip speed
+- `revenue_per_minute` — revenue generated per operational minute
 
-### Key Insights:
+The main business-analysis metric was:
 
-$$\text{Tip Ratio} = \frac{\text{Tip Amount}}{\text{Fare Amount}} \times 100$$
+$$
+\text{Tip Ratio} =
+\frac{\text{Tip Amount}}{\text{Fare Amount}}\times100
+$$
 
-1. **The Rush Hour Dominance (Mon–Fri, 16:00–19:00):** Contrary to the initial hypothesis about weekend party-goers, data reveals that the highest and most consistent median tip ratios occur during weekday evening rush hours. This may be associated with weekday commuting patterns and longer or more congested trips, although the dataset does not directly identify passenger purpose.
-2. **The Weekend Late-Night Myth:** While weekend nights (Friday & Saturday, 00:00–04:00) do show steady tipping behavior, they do not surpass the structured volume of the weekday business rush hour.
 ---
 
-![NYC Taxi Tipping Heatmap](heatmap.PNG)
+## 💰 Key Business Insight: Tip Patterns by Time
 
-## 🔍 Critical Analytical Note on Data Collection
-<details>
-<summary><b>Click to expand: Why the Mean would lie to you in this dataset</b></summary>
+Hourly and weekday patterns were analyzed using pivot tables and **median tip ratios**.
 
-During the exploratory phase, I discovered that the system only captures tipping data for **credit card transactions**. Cash tips are inherently not logged by the taximeter and appear as `0.0` in the raw data. 
+### Key Findings
 
-* **The Bias:** If we used the standard average (`mean`), these artificial cash zeroes would heavily drag down the metrics, showing fake low tips.
-* **The Solution:** The **median** was used as a robust summary statistic to reduce the influence of unobserved cash tips recorded as zero. This makes the comparison less sensitive to the artificial zero values, although the analysis remains limited to the tipping information captured by the dataset.
-</details>
+**Rush Hour Pattern — Monday to Friday, 16:00–19:00**
 
-## ⚡ Performance Optimization & Advanced Metrics
-* **Big Data Performance:** The pipeline directly processes memory-heavy `.parquet` columnar files using vectorized Pandas operations, optimizing RAM utilization on large scales.
-* **Operational Efficiency Metrics:** Engineered custom performance indicators to evaluate taxi fleet economics:
-  * `speed_mph`: Vectorized vehicle velocity tracking to pinpoint urban congestion impact.
-  * `revenue_per_minute`: Financial yield assessment per operational minute across different tariff codes (`RatecodeID`).
+The highest median tip ratios were observed during weekday evening rush hours.
+
+This pattern may be associated with weekday commuting and longer or more congested trips, although the dataset does not directly identify passenger purpose.
+
+**Weekend Late-Night Pattern**
+
+Friday and Saturday late-night trips also showed substantial tipping activity, but did not exceed the weekday evening pattern in median tip ratio.
+
+---
+
+## 🔍 Data Collection Bias: Cash Tips
+
+An important limitation was identified during the exploratory analysis.
+
+The dataset records tip information reliably for **credit-card transactions**, while cash tips are generally not recorded and appear as `0.0` in the raw data.
+
+This creates a large number of artificial zero values in `tip_amount`.
+
+Because of this limitation, **median tip ratios** were used as a more robust summary statistic. The median reduces the influence of these zero values and makes comparisons between time periods less sensitive to the missing cash-tip information.
+
+> The median does not recover the unobserved cash tips; the analysis remains limited by the information captured in the source dataset.
+
+---
+
+## ⚡ Performance & Operational Metrics
+
+The dataset contains more than **3.5 million records**, so the analysis was designed around vectorized operations and columnar Parquet data.
+
+### Performance
+
+- Processed large `.parquet` datasets using Pandas.
+- Used vectorized Pandas/NumPy operations for filtering and feature engineering.
+- Used PyArrow / FastParquet for Parquet data access.
+
+### Operational Metrics
+
+Two additional indicators were engineered:
+
+- **`speed_mph`** — estimated vehicle speed, useful for examining the impact of urban congestion.
+- **`revenue_per_minute`** — operational revenue yield across different tariff/rate codes.
+
+---
+
+## 📈 Exploratory Analysis
+
+The project includes analysis of:
+
+- passenger counts;
+- trip distances;
+- fares;
+- trip durations;
+- payment types;
+- tipping behavior;
+- hourly patterns;
+- weekday/weekend differences;
+- taxi rate codes;
+- vehicle speed;
+- revenue efficiency.
+
+Pivot tables and visualizations were used to identify temporal and operational patterns in the cleaned dataset.
+
+---
 
 ## 🛠️ Technical Stack
-* **Language:** Python 3
-* **Data Processing:** Pandas (Vectorized filtering, Pivot tables, Conditional formatting), NumPy
-* **Storage Engine:** PyArrow / FastParquet
-* **Visualization:** Matplotlib, Seaborn
+
+- **Python 3**
+- **Pandas** — data cleaning, filtering, aggregation, pivot tables
+- **NumPy** — numerical and vectorized operations
+- **Matplotlib** — visualization
+- **Seaborn** — statistical visualization
+- **PyArrow / FastParquet** — Parquet data processing
+
+---
+
+## 📁 Project Structure
+
+```text
+NYC-Taxi/
+│
+├── NYC_Taxi_EDA.ipynb
+├── README.md
+└── heatmap.png
 
